@@ -8,7 +8,7 @@ import numpy as np
 from concurrent.futures import ThreadPoolExecutor
 # Hyperparameters
 
-from bom_tools.preparation_tools import encode, recursive_directory_reader, calculate_non_transparent_percentage, scratch_pad, base_path, image_segment_split, _clear_scratch, image_parser_wrapper
+from bom_tools.preparation_tools import encode_lines, encode, get_vocabs, local_encode, recursive_directory_reader, calculate_non_transparent_percentage, scratch_pad, base_path, image_segment_split, _clear_scratch, image_parser_wrapper
 
 image_segment_split = 3
 
@@ -16,8 +16,7 @@ scratch_pad = "./data/scratch"
 base_path = "./data/train_bom_3"
 
 
-
-#main 
+# main
 if __name__ == "__main__":
     # get the current working directory
     cwd = "/data/BomWeather/BomWeather"
@@ -48,78 +47,63 @@ if __name__ == "__main__":
 
     all_percents = [result for result in results if result != 'No Result']
 
-    #print (all_percents)
+    # print (all_percents)
 
     bigstring = ""
-    
+
     for img_percent in all_percents:
         for percent in img_percent:
-            bigstring += f"{percent:03d}"
-        bigstring += "\n"       
-    #print (bigstring)
-    
+            bigstring += f"{percent} "
+        bigstring += "\n"
+    # print (bigstring)
+
     lines = bigstring.splitlines()
-    
-    all_ids = encode(lines)
-    
-    chars = sorted(list(set(all_ids)))
-    vocab_size = len(chars)
-    
-    
-    print(vocab_size)
-    
-    stoi = { ch:i for i,ch in enumerate(chars) }
-    itos = { i:ch for i,ch in enumerate(chars) }
-    
-    def local_encode(s):
-        return [stoi[c] for c in s] # encoder: take a string, output a list of integers
-    def local_decode(l):
-        return ''.join([itos[i] for i in l]) # decoder: take a list of integers, output a string
-    
-    # total_lines = len(lines)
-    
-    # split_index = int(total_lines * 0.9)  # Calculate the index where to split
 
-    # train_data = lines[:split_index]
-    # val_data = lines[split_index:]
+    # all_ids = encode(lines)
 
-    n = len(all_ids)
-    train_data = all_ids[:int(n*0.9)]
-    val_data = all_ids[int(n*0.9):]
+    vocabs = get_vocabs()
+
+    stoi = vocabs[0]
+    itos = vocabs[1]
+
+    total_lines = len(lines)
+
+    split_index = int(total_lines * 0.9)  # Calculate the index where to split
+
+    train_data = lines[:split_index]
+    val_data = lines[split_index:]
+
+    # n = len(all_ids)
+    # train_data = all_ids[:int(n*0.9)]
+    # val_data = all_ids[int(n*0.9):]
+
+    # Ensure teh percentages are encoded as a unit, not per char, e.g. 99 not 9 and 9 separately
+    train_ids = encode_lines(train_data, stoi)
+    val_ids = encode_lines(val_data, stoi)
     
 
-    train_ids = local_encode(train_data)
-    val_ids = local_encode(val_data)
-    
-   
-   
-    
-    
-     
     # num_copies = 1000
     # train_data_repeated = [x for x in train_ids for _ in range(num_copies)]
     # val_data_repeated = [x for x in val_ids for _ in range(num_copies)]
 
-
     train_ids = np.array(train_ids).astype(np.uint16)
     val_ids = np.array(val_ids).astype(np.uint16)
-    
+
     print(f"train has {len(train_ids):,} tokens")
     print(f"val has {len(val_ids):,} tokens")
-    
-    
+
     # ensure path exists
     if not os.path.exists(base_path):
         os.makedirs(base_path)
-        
+
     train_ids.tofile(os.path.join(base_path, 'train.bin'))
     val_ids.tofile(os.path.join(base_path, 'val.bin'))
 
     # save the meta information as well, to help us encode/decode later
     meta = {
-        'vocab_size': vocab_size, 
+        'vocab_size': vocabs[2],
         'itos': itos,
-        'stoi': stoi,       
+        'stoi': stoi,
     }
     with open(os.path.join(base_path, 'meta.pkl'), 'wb') as f:
         pickle.dump(meta, f)

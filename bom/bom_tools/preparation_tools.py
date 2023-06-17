@@ -10,7 +10,7 @@ import numpy as np
 from concurrent.futures import ThreadPoolExecutor
 # Hyperparameters
 image_segment_split = 3
-image_round_percent = 10
+image_round_percent = 1
 
 
 scratch_pad = "./data/scratch"
@@ -140,10 +140,10 @@ def image_parser(file):
     return percents
 
 def _clear_scratch():
-    
-    # remove all files and folders in scratch_pad
-    shutil.rmtree(scratch_pad)
-    
+    if os.path.exists(scratch_pad):
+        # remove all files and folders in scratch_pad
+        shutil.rmtree(scratch_pad)
+   
 def normalize(x, min_value=0, max_value=999999999):
     normalized_value = (x - min_value) / (max_value - min_value)
     return normalized_value
@@ -180,3 +180,37 @@ def decode(ints):
 def image_parser_wrapper(file):
     percents = image_parser(file)
     return percents if percents is not None else 'No Result'
+
+def get_vocabs():   
+
+    all_chars = [str(i) for i in range(101)]
+    all_chars.append(" ")
+    all_chars.append("\n")
+    
+    chars = sorted(list(set(all_chars)))
+    vocab_size = len(chars)    
+    
+    print(vocab_size)
+    
+    stoi = { ch:i for i,ch in enumerate(chars) }
+    itos = { i:ch for i,ch in enumerate(chars) }
+    
+    return (stoi, itos, vocab_size)
+    
+def local_encode(s, stoi):
+    return [stoi[c] for c in s] # encoder: take a string, output a list of integers
+def local_decode(l, itos):
+        return ''.join([itos[i] for i in l]) # decoder: take a list of integers, output a string
+    
+def encode_lines(lines, stoi):
+    result_ids = []
+    for i in lines:
+        #split local_encode(i) by ' '
+        splits =i.split(' ') 
+        for s in splits:
+            if s == '':
+                continue
+            result_ids.append(local_encode(s, stoi)[0])                      
+            
+        result_ids.append(local_encode('\n', stoi)[0])
+    return result_ids

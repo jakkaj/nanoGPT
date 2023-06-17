@@ -29,5 +29,13 @@
             "console": "integratedTerminal",
             "justMyCode": false,            
         },
+        {
+            "name": "BOM Get Latest Data",
+            "type": "python",
+            "request": "launch",
+            "program": "bom/get_current.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,            
+        },
     ]
 }
