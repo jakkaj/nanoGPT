@@ -7,7 +7,7 @@ ftp.login()
 # navigate to the directory you want to list
 ftp.cwd('/anon/gen/radar')
 
-locations = ["IDR664"]
+locations = ["IDR664", "IDR713"]
 
 # list the files in the directory
 files = ftp.nlst()

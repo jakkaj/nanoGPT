@@ -182,8 +182,8 @@ def image_parser_wrapper(file):
 #main 
 if __name__ == "__main__":
     # get the current working directory
-    cwd = "/data/BomWeather/BomWeather"
-    #cwd = "./data/bom_radar"
+    #cwd = "/data/BomWeather/BomWeather"
+    cwd = "./data/bom_radar/IDR713"
     _clear_scratch()
     # ensure scratch_pad path exists
     if not os.path.exists(scratch_pad):
@@ -230,28 +230,21 @@ if __name__ == "__main__":
     
     print(vocab_size)
     
-    stoi = { ch:i for i,ch in enumerate(chars) }
-    itos = { i:ch for i,ch in enumerate(chars) }
+    with open(os.path.join(base_path, 'meta.pkl'), 'rb') as f:
+        loaded_meta = pickle.load(f)
+    
+    stoi = loaded_meta.get('stoi')
+    itos = loaded_meta.get('itos')    
     
     def local_encode(s):
-        return [stoi[c] for c in s] # encoder: take a string, output a list of integers
+        return [stoi.get(c, -1) for c in s] # encoder: take a string, output a list of integers
     def local_decode(l):
         return ''.join([itos[i] for i in l]) # decoder: take a list of integers, output a string
     
-    # total_lines = len(lines)
     
-    # split_index = int(total_lines * 0.9)  # Calculate the index where to split
-
-    # train_data = lines[:split_index]
-    # val_data = lines[split_index:]
-
-    n = len(all_ids)
-    train_data = all_ids[:int(n*0.9)]
-    val_data = all_ids[int(n*0.9):]
     
-
-    train_ids = local_encode(train_data)
-    val_ids = local_encode(val_data)
+    train_ids = local_encode(all_ids)
+    
     
    
    
@@ -264,24 +257,8 @@ if __name__ == "__main__":
 
 
     train_ids = np.array(train_ids).astype(np.uint16)
-    val_ids = np.array(val_ids).astype(np.uint16)
+    
     
     print(f"train has {len(train_ids):,} tokens")
-    print(f"val has {len(val_ids):,} tokens")
+   
     
-    
-    # ensure path exists
-    if not os.path.exists(base_path):
-        os.makedirs(base_path)
-        
-    train_ids.tofile(os.path.join(base_path, 'train.bin'))
-    val_ids.tofile(os.path.join(base_path, 'val.bin'))
-
-    # save the meta information as well, to help us encode/decode later
-    meta = {
-        'vocab_size': vocab_size, 
-        'itos': itos,
-        'stoi': stoi,       
-    }
-    with open(os.path.join(base_path, 'meta.pkl'), 'wb') as f:
-        pickle.dump(meta, f)

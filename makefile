@@ -11,5 +11,9 @@ bom_downloader_docker:
 bom_train:
 	python train.py config/train_bom_3.py
 
+bom_generate:
+	python sample_bom.py --out_dir=out-trainbom-3
+
 shakespear_train:
 	python train.py config/train_shakespeare_char.py
+
