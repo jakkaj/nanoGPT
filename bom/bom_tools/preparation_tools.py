@@ -53,7 +53,7 @@ def calculate_non_transparent_percentage(image):
     #non_transparent_percentage = non_transparent_percentage / 100
     non_transparent_percentage = math.ceil(non_transparent_percentage / image_round_percent) * image_round_percent
 
-    # if(non_transparent_percentage != 0):
+    # if(non_transparent_percentage > 20):
     #     print(f"non_transparent_percentage: {non_transparent_percentage}")
 
     return non_transparent_percentage
@@ -198,7 +198,7 @@ def get_vocabs():
     return (stoi, itos, vocab_size)
     
 def local_encode(s, stoi):
-    return [stoi[c] for c in s] # encoder: take a string, output a list of integers
+    return stoi[s] # encoder: take a string, output a list of integers
 def local_decode(l, itos):
         return ''.join([itos[i] for i in l]) # decoder: take a list of integers, output a string
     
@@ -210,7 +210,8 @@ def encode_lines(lines, stoi):
         for s in splits:
             if s == '':
                 continue
-            result_ids.append(local_encode(s, stoi)[0])                      
             
-        result_ids.append(local_encode('\n', stoi)[0])
+            result_ids.append(local_encode(s, stoi))                      
+            
+        result_ids.append(local_encode('\n', stoi))
     return result_ids

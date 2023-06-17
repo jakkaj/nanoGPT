@@ -19,7 +19,7 @@ from bom_tools.preparation_tools import encode_lines, encode, recursive_director
 if __name__ == "__main__":
     # get the current working directory
     #cwd = "/data/BomWeather/BomWeather"
-    cwd = "./data/bom_radar/IDR713"
+    cwd = "/data/bom_radar/IDR713"
     
     with open(os.path.join(base_path, 'meta.pkl'), 'rb') as f:
         loaded_meta = pickle.load(f)
@@ -70,3 +70,5 @@ if __name__ == "__main__":
     #save bigstring to file
     with open(os.path.join(base_path, 'bigstring.txt'), 'w') as f:
         f.write(bigstring)
+        
+    print (bigstring)
