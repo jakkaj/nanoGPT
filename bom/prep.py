@@ -5,7 +5,7 @@ import numpy as np
 
 # Hyperparameters
 
-image_segment_split = 4
+image_segment_split = 3
 
 scratch_pad = "./data/scratch"
 
@@ -50,6 +50,10 @@ def calculate_non_transparent_percentage(image):
         # If image doesn't have an alpha channel, it's fully opaque
         non_transparent_percentage = 100
 
+    #round up non_transparent_percentage to nearest int
+    
+    
+
     return non_transparent_percentage
 
 # opens the file with opencv
@@ -61,6 +65,13 @@ def image_parser(file):
     filename_nopath = os.path.basename(file)
     
     
+    #trim the top 20 px from the img to take out bom logo
+    img = img[16:,:]
+    
+    threshold = np.all(img[..., :3] < [15, 15, 15], axis=2)
+
+    # For every pixel that is close to black, we set its alpha value to 0
+    img[threshold] = (0, 0, 0, 0)
 
     # get the height and width of the image
     height, width, channels = img.shape
@@ -103,7 +114,23 @@ def image_parser(file):
         percents.append(percent)
     
     print(percents)
-    
+    percentages = np.array(percents)
+    percentages = np.ceil(10 * percentages) / 100.0
+
+    # Clip values to the valid range for safety
+    percentages = np.clip(percentages, 0, 1)
+
+    # Reshape to 3x3 and convert to grayscale image
+    img_small = np.reshape(percentages, (3, 3))
+
+    # Convert small image to 8-bit grayscale image (range 0-255)
+    img_small = (img_small * 255).astype(np.uint8)
+
+    # Upscale using nearest neighbor interpolation (to avoid blending values)
+    img_large = cv2.resize(img_small, (384, 384), interpolation = cv2.INTER_NEAREST)
+    out_file = os.path.join(scratch_pad, filename_nopath + "_large.png")
+    # Save the image
+    cv2.imwrite(out_file, img_large)
 
 def _clear_scratch():
     
