@@ -141,7 +141,14 @@ def _clear_scratch():
     # remove all files and folders in scratch_pad
     shutil.rmtree(scratch_pad)
     
-    
+def normalize(x, min_value=0, max_value=999999999):
+    normalized_value = (x - min_value) / (max_value - min_value)
+    return normalized_value
+
+def denormalize(normalized_x, min_value=0, max_value=999999999):
+    original_value = normalized_x * (max_value - min_value) + min_value
+    return original_value
+   
     
 def encode(text_array):
     # split the text in to lines
@@ -153,14 +160,14 @@ def encode(text_array):
     for line in lines:
         lint_int = int(line)
         lines_array_int.append(lint_int)
-        lines_array_int.append(-1)
+        lines_array_int.append(999999999)
     
     return lines_array_int
 
 def decode(ints):
     output = ""
     for i in ints:
-        if i == -1:
+        if i == 999999999:
             output += "\n"
         else:
             output += f"{i:09d}"
@@ -202,28 +209,50 @@ if __name__ == "__main__":
     #print (bigstring)
     
     lines = bigstring.splitlines()
-
-    total_lines = len(lines)
     
-    split_index = int(total_lines * 0.9)  # Calculate the index where to split
-
-    train_data = lines[:split_index]
-    val_data = lines[split_index:]
-
-
+    all_ids = encode(lines)
     
-
-    train_ids = encode(train_data)
-    val_ids = encode(val_data)
-    
-    all_ints = sorted(list(set(train_ids))) + sorted(list(set(val_data)))
-    vocab_size = len(all_ints)
+    vocab_size = len(all_ids)
     print(vocab_size)
     
-     
+    stoi = { ch:i for i,ch in enumerate(all_ids) }
+    itos = { i:ch for i,ch in enumerate(all_ids) }
+    
+    def local_encode(s):
+        return [stoi[c] for c in s] # encoder: take a string, output a list of integers
+    def local_decode(l):
+        return ''.join([itos[i] for i in l]) # decoder: take a list of integers, output a string
+    
+    # total_lines = len(lines)
+    
+    # split_index = int(total_lines * 0.9)  # Calculate the index where to split
 
-    train_ids = np.array(train_ids).astype(np.uint16)
-    val_ids = np.array(val_ids).astype(np.uint16)
+    # train_data = lines[:split_index]
+    # val_data = lines[split_index:]
+
+    n = len(all_ids)
+    train_data = all_ids[:int(n*0.9)]
+    val_data = all_ids[int(n*0.9):]
+    
+
+    train_ids = local_encode(train_data)
+    val_ids = local_encode(val_data)
+    
+   
+   
+    
+    
+     
+    num_copies = 1000
+    train_data_repeated = [x for x in train_ids for _ in range(num_copies)]
+    val_data_repeated = [x for x in val_ids for _ in range(num_copies)]
+
+
+    train_ids = np.array(train_data_repeated).astype(np.uint16)
+    val_ids = np.array(val_data_repeated).astype(np.uint16)
+    
+    print(f"train has {len(train_ids):,} tokens")
+    print(f"val has {len(val_ids):,} tokens")
     
     base_path = "./data/train_bom_3"
     # ensure path exists
