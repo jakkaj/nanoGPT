@@ -23,7 +23,7 @@ for location in locations:
             year = date[0:4]
             month = date[4:6]
             day = date[6:8]
-            folder_path = f"./data/bom_radar/{location}/{year}/{month}/{day}/"
+            folder_path = f"/data/bom_radar/{location}/{year}/{month}/{day}/"
 
             # create the directory if it doesn't exist
             if not os.path.exists(folder_path):
