@@ -31,13 +31,13 @@ from model import GPTConfig, GPT
 # -----------------------------------------------------------------------------
 # either 'resume' (from an out_dir) or a gpt2 variant (e.g. 'gpt2-xl')
 init_from = 'resume'
-out_dir = 'out'  # ignored if init_from is not 'resume'
+out_dir = 'out-trainbom-3'  # ignored if init_from is not 'resume'
 start = "264"  # or "<|endoftext|>" or etc. Can also specify a file, use as: "FILE:prompt.txt"
 num_samples = 10  # number of samples to draw
 max_new_tokens = 500  # number of tokens generated in each sample
 # 1.0 = no change, < 1.0 = less random, > 1.0 = more random, in predictions
 temperature = 0.8
-top_k = 200  # retain only the top_k most likely tokens, clamp others to have 0 probability
+top_k = 100  # retain only the top_k most likely tokens, clamp others to have 0 probability
 seed = 1337
 device = 'cuda'  # examples: 'cpu', 'cuda', 'cuda:0', 'cuda:1', etc.
 dtype = 'bfloat16' if torch.cuda.is_bf16_supported(
@@ -106,7 +106,15 @@ else:
 if start.startswith('FILE:'):
     with open(start[5:], 'r', encoding='utf-8') as f:
         start = f.read()
-start_ids = encode([1000, -1, 1000000000000, -1, 1000000000000, -1, 1000000, -1, 0, -1, 1000000, -1, 1000000000000000000000000, -1, 1000000000000, -1, 1000000001000000, -1, 1000000000000000, -1, 1000000001000000000000, -1, 1000, -1, 0, -1, 1000001000001, -1, 1000000001000000, -1, 1001000000000, -1, 0, -1])
+start_ids = encode(
+    """ 
+0 0 0 0 0 0 0 0 0 
+0 0 0 0 1 0 1 0 1 
+0 0 0 1 0 0 1 0 0 
+0 0 0 0 1 1 0 0 0 
+0 0 0 0 0 0 0 0 0 
+"""
+)
 x = (torch.tensor(start_ids, dtype=torch.long, device=device)[None, ...])
 
 # run generation

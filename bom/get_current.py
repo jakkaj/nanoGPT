@@ -66,3 +66,7 @@ if __name__ == "__main__":
     ids = encode_lines(lines, stoi)
     
     print(ids)
+    
+    #save bigstring to file
+    with open(os.path.join(base_path, 'bigstring.txt'), 'w') as f:
+        f.write(bigstring)
