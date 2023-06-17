@@ -19,6 +19,16 @@
             "program": "bom/bom_download.py",
             "console": "integratedTerminal",
             "justMyCode": false
+        }
+        ,
+        {
+            "name": "BOM Prep",
+            "type": "python",
+            "request": "launch",
+            "program": "bom/prep.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "cwd": "${workspaceFolder}/src"
         },
     ]
 }

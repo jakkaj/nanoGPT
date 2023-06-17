@@ -6,3 +6,4 @@ datasets
 tiktoken
 wandb
 tqdm
+opencv-python
