@@ -1,4 +1,6 @@
+import math
 import os
+import pickle
 import shutil
 import cv2
 import numpy as np
@@ -54,7 +56,7 @@ def calculate_non_transparent_percentage(image):
     
     
 
-    return non_transparent_percentage
+    return math.ceil(non_transparent_percentage)
 
 # opens the file with opencv
 def image_parser(file):
@@ -113,7 +115,7 @@ def image_parser(file):
         percent = calculate_non_transparent_percentage(segment)
         percents.append(percent)
     
-    print(percents)
+    #print(percents)
     percentages = np.array(percents)
     percentages = np.ceil(10 * percentages) / 100.0
 
@@ -131,6 +133,8 @@ def image_parser(file):
     out_file = os.path.join(scratch_pad, filename_nopath + "_large.png")
     # Save the image
     cv2.imwrite(out_file, img_large)
+    
+    return percents
 
 def _clear_scratch():
     
@@ -139,6 +143,29 @@ def _clear_scratch():
     
     
     
+def encode(text_array):
+    # split the text in to lines
+    lines = text_array
+    
+    lines_array_int = []
+
+
+    for line in lines:
+        lint_int = int(line)
+        lines_array_int.append(lint_int)
+        lines_array_int.append(-1)
+    
+    return lines_array_int
+
+def decode(ints):
+    output = ""
+    for i in ints:
+        if i == -1:
+            output += "\n"
+        else:
+            output += f"{i:09d}"
+
+    return output
 
 #main 
 if __name__ == "__main__":
@@ -157,9 +184,58 @@ if __name__ == "__main__":
 
     files = sorted(files)
 
-    for file in files:
-        image_parser(file)
+    all_percents = []
 
-    # print the list of files
+    for file in files:
+        percents = image_parser(file)
+        all_percents.append(percents)
+
+
+    #print (all_percents)
+
+    bigstring = ""
+    
+    for img_percent in all_percents:
+        for percent in img_percent:
+            bigstring += str(percent)
+        bigstring += "\n"       
+    #print (bigstring)
+    
+    lines = bigstring.splitlines()
+
+    total_lines = len(lines)
+    
+    split_index = int(total_lines * 0.9)  # Calculate the index where to split
+
+    train_data = lines[:split_index]
+    val_data = lines[split_index:]
+
+
     
 
+    train_ids = encode(train_data)
+    val_ids = encode(val_data)
+    
+    all_ints = sorted(list(set(train_ids))) + sorted(list(set(val_data)))
+    vocab_size = len(all_ints)
+    print(vocab_size)
+    
+     
+
+    train_ids = np.array(train_ids).astype(np.uint16)
+    val_ids = np.array(val_ids).astype(np.uint16)
+    
+    base_path = "./data/train_bom_3"
+    # ensure path exists
+    if not os.path.exists(base_path):
+        os.makedirs(base_path)
+        
+    train_ids.tofile(os.path.join(base_path, 'train.bin'))
+    val_ids.tofile(os.path.join(base_path, 'val.bin'))
+
+    # save the meta information as well, to help us encode/decode later
+    meta = {
+        'vocab_size': vocab_size,        
+    }
+    with open(os.path.join(base_path, 'meta.pkl'), 'wb') as f:
+        pickle.dump(meta, f)
