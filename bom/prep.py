@@ -1,10 +1,11 @@
 import math
 import os
+from pathlib import Path
 import pickle
 import shutil
 import cv2
 import numpy as np
-
+from concurrent.futures import ThreadPoolExecutor
 # Hyperparameters
 
 image_segment_split = 3
@@ -13,24 +14,10 @@ scratch_pad = "./data/scratch"
 
 
 # a method that is a recursive directory reader
-def recursive_directory_reader(path, file_list):
+def recursive_directory_reader(path):
     
 
-    # get the list of files in the directory
-    files = os.listdir(path)
-
-    # iterate over the files
-    for file in files:
-        # check if the file is a directory
-        if os.path.isdir(path + "/" + file):
-            # if the file is a directory, call this method again with the new path
-            file_list = recursive_directory_reader(path + "/" + file, file_list)
-        else:
-            # if the file is not a directory, append it to the list
-            file_list.append(path  + file)
-
-    # return the file list
-    return file_list
+    return [str(f) for f in Path(path).rglob("*.png")]
 
 
 def calculate_non_transparent_percentage(image):
@@ -48,22 +35,36 @@ def calculate_non_transparent_percentage(image):
 
         # Calculate percentage
         non_transparent_percentage = (non_transparent_pixels / total_pixels) * 100
+        
+        #round non_transparent_percentage to nearest 5%
+        
+        
+        
     else:
         # If image doesn't have an alpha channel, it's fully opaque
         non_transparent_percentage = 100
 
-    #round up non_transparent_percentage to nearest int
-    
     
 
-    return math.ceil(non_transparent_percentage)
+    #round up non_transparent_percentage to nearest int
+    non_transparent_percentage =  math.ceil(non_transparent_percentage)
+    #non_transparent_percentage = non_transparent_percentage / 100
+    #non_transparent_percentage = math.ceil(non_transparent_percentage / 5) * 5
+
+    # if(non_transparent_percentage != 0):
+    #     print(f"non_transparent_percentage: {non_transparent_percentage}")
+
+    return non_transparent_percentage
 
 # opens the file with opencv
 def image_parser(file):
+    #print(file)
     global image_segments
     # open the file with opencv
     img = cv2.imread(file, cv2.IMREAD_UNCHANGED)
-
+    if(img is None):
+        print(f"Dead: {file}")
+        return None
     filename_nopath = os.path.basename(file)
     
     
@@ -111,7 +112,7 @@ def image_parser(file):
         segment = image_segments[i]
         file_name = os.path.join(scratch_pad, filename_nopath + "_" + str(i) + ".png")
         #ensure the path for file_name exists
-        cv2.imwrite(file_name, segment)
+        #cv2.imwrite(file_name, segment)
         percent = calculate_non_transparent_percentage(segment)
         percents.append(percent)
     
@@ -132,7 +133,7 @@ def image_parser(file):
     img_large = cv2.resize(img_small, (384, 384), interpolation = cv2.INTER_NEAREST)
     out_file = os.path.join(scratch_pad, filename_nopath + "_large.png")
     # Save the image
-    cv2.imwrite(out_file, img_large)
+    #cv2.imwrite(out_file, img_large)
     
     return percents
 
@@ -160,24 +161,29 @@ def encode(text_array):
     for line in lines:
         lint_int = int(line)
         lines_array_int.append(lint_int)
-        lines_array_int.append(999999999)
+        lines_array_int.append(1)
     
     return lines_array_int
 
 def decode(ints):
     output = ""
     for i in ints:
-        if i == 999999999:
+        if i == 1:
             output += "\n"
         else:
             output += f"{i:09d}"
 
     return output
 
+def image_parser_wrapper(file):
+    percents = image_parser(file)
+    return percents if percents is not None else 'No Result'
+
 #main 
 if __name__ == "__main__":
     # get the current working directory
-    cwd = "/data/bom_radar/IDR664/2023/06/17/"
+    cwd = "/data/BomWeather/BomWeather"
+    #cwd = "./data/bom_radar"
     _clear_scratch()
     # ensure scratch_pad path exists
     if not os.path.exists(scratch_pad):
@@ -187,16 +193,22 @@ if __name__ == "__main__":
     files = []
 
     # call the recursive directory reader method
-    files = recursive_directory_reader(cwd, files)
+    files = recursive_directory_reader(cwd)
 
     files = sorted(files)
 
     all_percents = []
 
-    for file in files:
-        percents = image_parser(file)
-        all_percents.append(percents)
+    # for file in files:
+    #     percents = image_parser(file)
+    #     if percents is None:
+    #         continue
+    #     all_percents.append(percents)
 
+    with ThreadPoolExecutor(max_workers=16) as executor:
+        results = executor.map(image_parser_wrapper, files)
+
+    all_percents = [result for result in results if result != 'No Result']
 
     #print (all_percents)
 
@@ -212,11 +224,14 @@ if __name__ == "__main__":
     
     all_ids = encode(lines)
     
-    vocab_size = len(all_ids)
+    chars = sorted(list(set(all_ids)))
+    vocab_size = len(chars)
+    
+    
     print(vocab_size)
     
-    stoi = { ch:i for i,ch in enumerate(all_ids) }
-    itos = { i:ch for i,ch in enumerate(all_ids) }
+    stoi = { ch:i for i,ch in enumerate(chars) }
+    itos = { i:ch for i,ch in enumerate(chars) }
     
     def local_encode(s):
         return [stoi[c] for c in s] # encoder: take a string, output a list of integers
@@ -243,13 +258,13 @@ if __name__ == "__main__":
     
     
      
-    num_copies = 1000
-    train_data_repeated = [x for x in train_ids for _ in range(num_copies)]
-    val_data_repeated = [x for x in val_ids for _ in range(num_copies)]
+    # num_copies = 1000
+    # train_data_repeated = [x for x in train_ids for _ in range(num_copies)]
+    # val_data_repeated = [x for x in val_ids for _ in range(num_copies)]
 
 
-    train_ids = np.array(train_data_repeated).astype(np.uint16)
-    val_ids = np.array(val_data_repeated).astype(np.uint16)
+    train_ids = np.array(train_ids).astype(np.uint16)
+    val_ids = np.array(val_ids).astype(np.uint16)
     
     print(f"train has {len(train_ids):,} tokens")
     print(f"val has {len(val_ids):,} tokens")
