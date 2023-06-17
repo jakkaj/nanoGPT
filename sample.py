@@ -1,4 +1,24 @@
 """
+
+# Read in the data
+data = pd.read_csv('data.csv')
+
+# Rename columns
+data = data.rename(columns={'Unnamed: 0': 'id'})
+
+# Drop rows with missing values
+data = data.dropna()
+
+# Create new column with the log of the price
+data['log_price'] = np.log(data['price'])
+
+# Create new column with the log of the minimum number of nights
+data['log_min_nights'] = np.log(data['minimum_nights'])
+
+# Create new column with the log of the number of reviews
+data['log_reviews'] = np.log(data['number_of_reviews'])
+
+# Create new column with the log
 Sample from a trained model
 """
 import os
