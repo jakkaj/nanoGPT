@@ -8,9 +8,9 @@ import numpy as np
 from concurrent.futures import ThreadPoolExecutor
 # Hyperparameters
 
-from bom_tools.preparation_tools import encode_lines, encode, get_vocabs, local_encode, recursive_directory_reader, calculate_non_transparent_percentage, scratch_pad, base_path, image_segment_split, _clear_scratch, image_parser_wrapper
+from bom_tools.preparation_tools import get_percents, encode_lines, encode, get_vocabs, local_encode, recursive_directory_reader, calculate_non_transparent_percentage, scratch_pad, base_path, image_segment_split, _clear_scratch, image_parser_wrapper
 
-image_segment_split = 3
+
 
 scratch_pad = "./data/scratch"
 base_path = "./data/train_bom_3"
@@ -34,18 +34,9 @@ if __name__ == "__main__":
 
     files = sorted(files)
 
-    all_percents = []
+    
 
-    # for file in files:
-    #     percents = image_parser(file)
-    #     if percents is None:
-    #         continue
-    #     all_percents.append(percents)
-
-    with ThreadPoolExecutor(max_workers=16) as executor:
-        results = executor.map(image_parser_wrapper, files)
-
-    all_percents = [result for result in results if result != 'No Result']
+    all_percents = get_percents(files)
 
     # print (all_percents)
 

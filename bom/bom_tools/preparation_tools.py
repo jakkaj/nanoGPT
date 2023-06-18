@@ -8,8 +8,9 @@ import shutil
 import cv2
 import numpy as np
 from concurrent.futures import ThreadPoolExecutor
+from tqdm import tqdm
 # Hyperparameters
-image_segment_split = 3
+image_segment_split = 5
 image_round_percent = 1
 
 
@@ -65,7 +66,7 @@ def image_parser(file):
     # open the file with opencv
     img = cv2.imread(file, cv2.IMREAD_UNCHANGED)
     if(img is None):
-        print(f"Dead: {file}")
+        #print(f"Dead: {file}")
         return None
     filename_nopath = os.path.basename(file)
     
@@ -126,13 +127,13 @@ def image_parser(file):
     percentages = np.clip(percentages, 0, 1)
 
     # Reshape to 3x3 and convert to grayscale image
-    img_small = np.reshape(percentages, (3, 3))
+    img_small = np.reshape(percentages, (image_segment_split, image_segment_split))
 
     # Convert small image to 8-bit grayscale image (range 0-255)
     img_small = (img_small * 255).astype(np.uint8)
 
     # Upscale using nearest neighbor interpolation (to avoid blending values)
-    img_large = cv2.resize(img_small, (384, 384), interpolation = cv2.INTER_NEAREST)
+    img_large = cv2.resize(img_small, (image_segment_split * 128, image_segment_split * 128), interpolation = cv2.INTER_NEAREST)
     out_file = os.path.join(scratch_pad, filename_nopath + "_large.png")
     # Save the image
     #cv2.imwrite(out_file, img_large)
@@ -226,14 +227,12 @@ def encode_lines(lines, stoi):
 def get_percents(files):
     all_percents = []
 
-    # for file in files:
-    #     percents = image_parser(file)
-    #     if percents is None:
-    #         continue
-    #     all_percents.append(percents)
+    
+    
 
     with ThreadPoolExecutor(max_workers=16) as executor:
-        results = executor.map(image_parser_wrapper, files)
+        results = list(tqdm(executor.map(image_parser_wrapper, files), total=len(files)))
+
 
     all_percents = [result for result in results if result != 'No Result']
     

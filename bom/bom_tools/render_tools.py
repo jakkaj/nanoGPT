@@ -31,7 +31,7 @@ def render_bigstring(bigstring, target, scratch, clear_files=False, repeat=1):
         np_percent = np_percent * 10
         np_matrix = np.reshape(np_percent, (image_segment_split, image_segment_split))
         #print (np_matrix)
-        image = np.zeros((384, 384), dtype=np.uint8)
+        image = np.zeros((image_segment_split * 128, image_segment_split * 128), dtype=np.uint8)
 
         # fill each segment with the corresponding percentage
         for j in range(image_segment_split):

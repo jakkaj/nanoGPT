@@ -18,8 +18,8 @@ def run_process(command):
 if __name__ == "__main__":   
     
     render_path = "/data/BomWeather/BomWeather/2020/07/07"
-    
-    starter = "0300.png"
+    #render_path = "/data/bom_radar/IDR713/2023/06/18"
+    starter = "00"
     
     scratch = _clear_scratch()    
     
@@ -73,7 +73,7 @@ if __name__ == "__main__":
     valid_score_lines = []
     for line in score_lines.splitlines():
         score = line.split()
-        if len(score) != 9:
+        if len(score) != image_segment_split * image_segment_split:
             continue
         valid_score_lines.append(line)
     
@@ -83,7 +83,7 @@ if __name__ == "__main__":
     original_lines = bigstring.splitlines()[:len(valid_score_lines)]
     render_bigstring("\n".join(valid_score_lines), gif5, scratch, True, 20)
     render_bigstring("\n".join(original_lines), gif6, scratch, True, 20)
-    join_gifs([gif6, gif5], gif7)
+    join_gifs([gif5, gif6], gif7)
     
     
     
