@@ -12,7 +12,7 @@ def render_gif(files, target):
             image = imageio.imread(file)
             writer.append_data(image)
 
-def render_bigstring(bigstring, target, scratch):
+def render_bigstring(bigstring, target, scratch, clear_files=False, repeat=1):
     
     scratch_path = os.path.join(scratch, "render_bigstring")
     # ensure scratch_path exists
@@ -27,6 +27,8 @@ def render_bigstring(bigstring, target, scratch):
         line = line.strip()
         percents = [int(p) for p in line.split(' ')]
         np_percent = np.array(percents)
+        # multiple them all by 10
+        np_percent = np_percent * 10
         np_matrix = np.reshape(np_percent, (image_segment_split, image_segment_split))
         #print (np_matrix)
         image = np.zeros((384, 384), dtype=np.uint8)
@@ -43,11 +45,17 @@ def render_bigstring(bigstring, target, scratch):
 
         
         # save the image
-        image_save_path = os.path.join(scratch_path, str(line_num) + ".png")
-        files.append(image_save_path)
-        cv2.imwrite(image_save_path, image)
+        for i in range(repeat):
+            image_save_path = os.path.join(scratch_path, str(line_num) + "_" + str(i) + ".png")
+            files.append(image_save_path)
+            cv2.imwrite(image_save_path, image)
+        
         
     render_gif(files, target)
+    if clear_files:
+        # remove all files in files
+        for file in files:
+            os.remove(file)
     
 
 """
@@ -56,7 +64,7 @@ saves the output to a new gif
 """
 
 
-def join_gifs(gif_paths, output_path):
+def join_gifs(gif_paths, output_path, duration=0.3):
     # read all GIF files into a list of images sequences (frames)
     gif_images = [imageio.mimread(path) for path in gif_paths]
 
@@ -78,6 +86,6 @@ def join_gifs(gif_paths, output_path):
 
         # Concatenate frames side by side and append to output frames list
         output_images.append(np.concatenate(frames, axis=1))
-
+    
     # Save new gif
-    imageio.mimsave(output_path, output_images, 'GIF', duration=0.3)
+    imageio.mimsave(output_path, output_images, 'GIF', duration=duration)

@@ -20,8 +20,8 @@ base_path = "./data/train_bom_3"
 if __name__ == "__main__":
     # get the current working directory
     cwd = "/data/BomWeather/BomWeather"
-    #cwd = "./data/bom_radar"
-    _clear_scratch()
+    #cwd = "/data/BomWeather/BomWeather/2020/07"
+    scratch_path = _clear_scratch()
     # ensure scratch_pad path exists
     if not os.path.exists(scratch_pad):
         os.makedirs(scratch_pad)
@@ -55,16 +55,25 @@ if __name__ == "__main__":
         for percent in img_percent:
             bigstring += f"{percent} "
         bigstring += "\n"
-    # print (bigstring)
+    
+    # save bigstring to file`
+    with open(os.path.join(scratch_path, 'bigstring.txt'), 'w') as f:
+        f.write(bigstring)
 
     lines = bigstring.splitlines()
 
-    # all_ids = encode(lines)
+    
 
     vocabs = get_vocabs()
 
     stoi = vocabs[0]
     itos = vocabs[1]
+    
+    # bigstring_ids = encode_lines(lines, stoi)
+
+    # # save all ids to file
+    # with open(os.path.join(scratch_path, 'bigstring_encoded.txt'), 'w') as f:
+    #     f.write(bigstring_ids)
 
     total_lines = len(lines)
 
