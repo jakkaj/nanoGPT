@@ -5,9 +5,9 @@ import numpy as np
 from skimage.transform import resize
 from bom_tools.preparation_tools import image_segment_split
 
-def render_gif(files, target):
+def render_gif(files, target, duration=100):
     # create the animation
-    with imageio.get_writer(target, mode='I') as writer:
+    with imageio.get_writer(target, mode='I', duration=duration, loop=0) as writer:
         for file in files:
             image = imageio.imread(file)
             writer.append_data(image)

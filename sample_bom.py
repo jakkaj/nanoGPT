@@ -24,6 +24,7 @@ Sample from a trained model
 import os
 import pickle
 from contextlib import nullcontext
+import random
 import torch
 import tiktoken
 from model import GPTConfig, GPT
@@ -40,11 +41,15 @@ start = """5 5 0 5 5 5 0 5 20
 """  # or "<|endoftext|>" or etc. Can also specify a file, use as: "FILE:prompt.txt"
 save_to = ""
 num_samples = 1  # number of samples to draw
-max_new_tokens = 1024  # number of tokens generated in each sample
+max_new_tokens = 2048  # number of tokens generated in each sample
 # 1.0 = no change, < 1.0 = less random, > 1.0 = more random, in predictions
-temperature = 0.8
-top_k = 200  # retain only the top_k most likely tokens, clamp others to have 0 probability
-seed = 1337
+
+#1 AND 400 IS PRETTY GOOD (JORDO)
+
+temperature = .8
+top_k = 400  # retain only the top_k most likely tokens, clamp others to have 0 probability
+seed = random.randint(0, 10000)
+#seed = 1337
 device = 'cuda'  # examples: 'cpu', 'cuda', 'cuda:0', 'cuda:1', etc.
 dtype = 'bfloat16' if torch.cuda.is_bf16_supported(
 ) else 'float16'  # 'float32' or 'bfloat16' or 'float16'
@@ -110,11 +115,10 @@ if load_meta:
             
             if s == '':
                 continue
-            result_ids.append(stoi[s])
-            result_ids.append(stoi[' '])              
+            result_ids.append(stoi[s])                     
         return result_ids
         
-    def decode(l): return ''.join([itos[i] for i in l])
+    def decode(l): return ' '.join([itos[i] for i in l])
 else:
     # ok let's assume gpt-2 encodings by default
     print("No meta.pkl found, assuming GPT-2 encodings...")

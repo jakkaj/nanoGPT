@@ -10,7 +10,7 @@ import numpy as np
 from concurrent.futures import ThreadPoolExecutor
 from tqdm import tqdm
 # Hyperparameters
-image_segment_split = 5
+image_segment_split = 6
 image_round_percent = 1
 
 
@@ -217,8 +217,6 @@ def encode_lines(lines, stoi):
                 continue
             
             result_ids.append(local_encode(s, stoi))
-            result_ids.append(local_encode(' ', stoi))                      
-        
         
         result_ids.append(local_encode('\n', stoi))
         

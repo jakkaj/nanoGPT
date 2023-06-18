@@ -17,9 +17,18 @@ def run_process(command):
 #main
 if __name__ == "__main__":   
     
+    prompt_number = 32    
     render_path = "/data/BomWeather/BomWeather/2020/07/07"
+    starter = "336.png"
+    
+    
+    # this one is good (big storm from west)
+    # prompt_number = 12
+    # render_path = "/data/BomWeather/BomWeather/2020/06/20"
+    # starter = "1524.png"
+    
     #render_path = "/data/bom_radar/IDR713/2023/06/18"
-    starter = "642.png"
+    
     
     scratch = _clear_scratch()    
     
@@ -44,7 +53,7 @@ if __name__ == "__main__":
     
     bigstring = get_percents_string(all_percents)    
     
-    prompt_number = 8
+    
     
     # get prompt_number lines from start of bigstring
     lines = bigstring.splitlines()[:prompt_number]    
@@ -81,18 +90,18 @@ if __name__ == "__main__":
     
     # get len(valid_score_lines) lines from teh start of bigstring
     original_lines = bigstring.splitlines()[:len(valid_score_lines)]
-    render_bigstring("\n".join(valid_score_lines), gif5, scratch, True, 30, prompt_number)
-    render_bigstring("\n".join(original_lines), gif6, scratch, True, 30)
+    render_bigstring("\n".join(valid_score_lines), gif5, scratch, True, 1, prompt_number)
+    render_bigstring("\n".join(original_lines), gif6, scratch, True, 1)
     join_gifs([gif6, gif5], gif7)
     
     
     
     
     
-    
+    # render originals and things
     render_gif(files, gif1)
     
     render_bigstring(bigstring, gif2, scratch)
     render_bigstring(prompt_lines, gif4, scratch)
     
-    join_gifs([gif1, gif2], gif3)
+    #join_gifs([gif1, gif2], gif3)
