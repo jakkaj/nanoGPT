@@ -34,10 +34,10 @@ init_from = 'resume'
 out_dir = 'out-trainbom-3'  # ignored if init_from is not 'resume'
 start = "264"  # or "<|endoftext|>" or etc. Can also specify a file, use as: "FILE:prompt.txt"
 num_samples = 1  # number of samples to draw
-max_new_tokens = 27  # number of tokens generated in each sample
+max_new_tokens = 120  # number of tokens generated in each sample
 # 1.0 = no change, < 1.0 = less random, > 1.0 = more random, in predictions
-temperature = 0.8
-top_k = 100  # retain only the top_k most likely tokens, clamp others to have 0 probability
+temperature = 0.5
+top_k = 200  # retain only the top_k most likely tokens, clamp others to have 0 probability
 seed = 1337
 device = 'cuda'  # examples: 'cpu', 'cuda', 'cuda:0', 'cuda:1', etc.
 dtype = 'bfloat16' if torch.cuda.is_bf16_supported(
@@ -94,7 +94,7 @@ if load_meta:
     # TODO want to make this more general to arbitrary encoder/decoder schemes
     stoi, itos = meta['stoi'], meta['itos']
     def encode(s): return [stoi[c] for c in s]
-    def decode(l): return ' '.join([itos[i] for i in l])
+    def decode(l): return ''.join([itos[i] for i in l])
 else:
     # ok let's assume gpt-2 encodings by default
     print("No meta.pkl found, assuming GPT-2 encodings...")
@@ -107,13 +107,13 @@ if start.startswith('FILE:'):
     with open(start[5:], 'r', encoding='utf-8') as f:
         start = f.read()
 start_ids = encode(
-    """ 
+    """0 0 0 1 1 0 0 0 0 
+0 0 0 1 1 0 1 1 0 
 0 0 0 0 0 0 0 0 0 
-0 0 0 0 40 0 1 0 1 
-0 50 0 1 0 0 1 0 0 
-0 0 0 60 1 1 0 0 0 
-0 0 0 0 0 0 0 0 0 
-"""
+0 0 0 1 1 0 0 0 0 
+0 0 0 0 1 0 1 0 0 
+0 0 0 1 1 0 0 1 0 
+0 0 0 0 1 0 0 0 0 """
 )
 x = (torch.tensor(start_ids, dtype=torch.long, device=device)[None, ...])
 
@@ -123,7 +123,7 @@ with torch.no_grad():
         for k in range(num_samples):
             y = model.generate(x, max_new_tokens,
                                temperature=temperature, top_k=top_k)
-            #print(y[0].tolist())
+            print(y[0].tolist())
             decoded = decode(y[0].tolist())
             print(decoded)
             print('---------------')

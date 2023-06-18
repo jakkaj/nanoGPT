@@ -6,7 +6,7 @@ gpt2:
 	
 bom_downloader_docker:
 	cd bom && docker build -t bom_downloader ./
-	docker run -it --rm -v $(HOST_PROJECT_PATH)/data/bom_radar:/app/data/bom_radar bom_downloader
+	docker run -it --rm -v /data/bom_radar:/app/data/bom_radar bom_downloader
 
 bom_train:
 	python train.py config/train_bom_3.py

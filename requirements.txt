@@ -7,3 +7,5 @@ tiktoken
 wandb
 tqdm
 opencv-python
+imageio
+scikit-image

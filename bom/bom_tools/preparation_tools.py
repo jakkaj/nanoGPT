@@ -143,6 +143,10 @@ def _clear_scratch():
     if os.path.exists(scratch_pad):
         # remove all files and folders in scratch_pad
         shutil.rmtree(scratch_pad)
+    # ensure scratch_pad path exists
+    if not os.path.exists(scratch_pad):
+        os.makedirs(scratch_pad)
+    return scratch_pad
    
 def normalize(x, min_value=0, max_value=999999999):
     normalized_value = (x - min_value) / (max_value - min_value)
@@ -211,7 +215,34 @@ def encode_lines(lines, stoi):
             if s == '':
                 continue
             
-            result_ids.append(local_encode(s, stoi))                      
+            result_ids.append(local_encode(s, stoi))
+            result_ids.append(local_encode(' ', stoi))                      
             
         result_ids.append(local_encode('\n', stoi))
     return result_ids
+
+def get_percents(files):
+    all_percents = []
+
+    # for file in files:
+    #     percents = image_parser(file)
+    #     if percents is None:
+    #         continue
+    #     all_percents.append(percents)
+
+    with ThreadPoolExecutor(max_workers=16) as executor:
+        results = executor.map(image_parser_wrapper, files)
+
+    all_percents = [result for result in results if result != 'No Result']
+    
+    return all_percents
+
+def get_percents_string(all_percents):
+    bigstring = ""
+    
+    for img_percent in all_percents:
+        for percent in img_percent:
+            bigstring += f"{percent} "
+        bigstring += "\n"
+    
+    return bigstring
