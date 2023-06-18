@@ -187,7 +187,7 @@ def image_parser_wrapper(file):
 
 def get_vocabs():   
 
-    all_chars = [str(i) for i in range(101)]
+    all_chars = [str(i) for i in range(0, 101, image_round_percent)]
     all_chars.append(" ")
     all_chars.append("\n")
     
@@ -217,8 +217,10 @@ def encode_lines(lines, stoi):
             
             result_ids.append(local_encode(s, stoi))
             result_ids.append(local_encode(' ', stoi))                      
-            
+        
+        
         result_ids.append(local_encode('\n', stoi))
+        
     return result_ids
 
 def get_percents(files):

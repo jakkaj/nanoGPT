@@ -32,7 +32,12 @@ from model import GPTConfig, GPT
 # either 'resume' (from an out_dir) or a gpt2 variant (e.g. 'gpt2-xl')
 init_from = 'resume'
 out_dir = 'out-trainbom-3'  # ignored if init_from is not 'resume'
-start = "264"  # or "<|endoftext|>" or etc. Can also specify a file, use as: "FILE:prompt.txt"
+start = """5 5 0 5 5 5 0 5 20 
+5 5 0 5 5 5 0 5 20 
+5 5 0 5 5 5 0 5 20 
+5 5 0 5 5 10 0 5 15 
+5 5 0 5 5 10 0 5 15 
+"""  # or "<|endoftext|>" or etc. Can also specify a file, use as: "FILE:prompt.txt"
 save_to = ""
 num_samples = 1  # number of samples to draw
 max_new_tokens = 128  # number of tokens generated in each sample
@@ -94,7 +99,21 @@ if load_meta:
         meta = pickle.load(f)
     # TODO want to make this more general to arbitrary encoder/decoder schemes
     stoi, itos = meta['stoi'], meta['itos']
-    def encode(s): return [stoi[c] for c in s]
+    def encode(s_inptut):
+        result_ids = []
+        splits =s_inptut.split(' ')
+        for s in splits:
+            
+            if '\n' in s:
+                s = s.replace('\n', '')
+                result_ids.append(stoi['\n'])
+            
+            if s == '':
+                continue
+            result_ids.append(stoi[s])
+            result_ids.append(stoi[' '])              
+        return result_ids
+        
     def decode(l): return ''.join([itos[i] for i in l])
 else:
     # ok let's assume gpt-2 encodings by default

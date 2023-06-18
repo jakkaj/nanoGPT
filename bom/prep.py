@@ -19,8 +19,8 @@ base_path = "./data/train_bom_3"
 # main
 if __name__ == "__main__":
     # get the current working directory
-    cwd = "/data/BomWeather/BomWeather"
-    #cwd = "/data/BomWeather/BomWeather/2020/07"
+    #cwd = "/data/BomWeather/BomWeather"
+    cwd = "/data/BomWeather/BomWeather/2020/07"
     scratch_path = _clear_scratch()
     # ensure scratch_pad path exists
     if not os.path.exists(scratch_pad):
