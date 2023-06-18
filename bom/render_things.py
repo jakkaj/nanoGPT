@@ -81,8 +81,8 @@ if __name__ == "__main__":
     
     # get len(valid_score_lines) lines from teh start of bigstring
     original_lines = bigstring.splitlines()[:len(valid_score_lines)]
-    render_bigstring("\n".join(valid_score_lines), gif5, scratch, True, 10)
-    render_bigstring("\n".join(original_lines), gif6, scratch, True, 10)
+    render_bigstring("\n".join(valid_score_lines), gif5, scratch, True, 20)
+    render_bigstring("\n".join(original_lines), gif6, scratch, True, 20)
     join_gifs([gif6, gif5], gif7)
     
     

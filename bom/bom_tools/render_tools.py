@@ -88,4 +88,4 @@ def join_gifs(gif_paths, output_path, duration=0.3):
         output_images.append(np.concatenate(frames, axis=1))
     
     # Save new gif
-    imageio.mimsave(output_path, output_images, 'GIF', duration=duration)
+    imageio.mimsave(output_path, output_images, 'GIF', duration=duration, loop=0)

@@ -10,7 +10,7 @@ import numpy as np
 from concurrent.futures import ThreadPoolExecutor
 # Hyperparameters
 image_segment_split = 3
-image_round_percent = 5
+image_round_percent = 1
 
 
 scratch_pad = "./data/scratch"
