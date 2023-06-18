@@ -40,7 +40,7 @@ start = """5 5 0 5 5 5 0 5 20
 """  # or "<|endoftext|>" or etc. Can also specify a file, use as: "FILE:prompt.txt"
 save_to = ""
 num_samples = 1  # number of samples to draw
-max_new_tokens = 768  # number of tokens generated in each sample
+max_new_tokens = 1024  # number of tokens generated in each sample
 # 1.0 = no change, < 1.0 = less random, > 1.0 = more random, in predictions
 temperature = 0.8
 top_k = 200  # retain only the top_k most likely tokens, clamp others to have 0 probability

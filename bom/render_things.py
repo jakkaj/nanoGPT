@@ -19,7 +19,7 @@ if __name__ == "__main__":
     
     render_path = "/data/BomWeather/BomWeather/2020/07/07"
     #render_path = "/data/bom_radar/IDR713/2023/06/18"
-    starter = "00"
+    starter = "642.png"
     
     scratch = _clear_scratch()    
     
@@ -44,7 +44,7 @@ if __name__ == "__main__":
     
     bigstring = get_percents_string(all_percents)    
     
-    prompt_number = 5
+    prompt_number = 8
     
     # get prompt_number lines from start of bigstring
     lines = bigstring.splitlines()[:prompt_number]    
@@ -81,14 +81,14 @@ if __name__ == "__main__":
     
     # get len(valid_score_lines) lines from teh start of bigstring
     original_lines = bigstring.splitlines()[:len(valid_score_lines)]
-    render_bigstring("\n".join(valid_score_lines), gif5, scratch, True, 20)
-    render_bigstring("\n".join(original_lines), gif6, scratch, True, 20)
-    join_gifs([gif5, gif6], gif7)
+    render_bigstring("\n".join(valid_score_lines), gif5, scratch, True, 30, prompt_number)
+    render_bigstring("\n".join(original_lines), gif6, scratch, True, 30)
+    join_gifs([gif6, gif5], gif7)
     
     
     
     
-    exit()
+    
     
     render_gif(files, gif1)
     

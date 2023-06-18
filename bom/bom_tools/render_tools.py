@@ -12,7 +12,7 @@ def render_gif(files, target):
             image = imageio.imread(file)
             writer.append_data(image)
 
-def render_bigstring(bigstring, target, scratch, clear_files=False, repeat=1):
+def render_bigstring(bigstring, target, scratch, clear_files=False, repeat=1, original_amount=0):
     
     scratch_path = os.path.join(scratch, "render_bigstring")
     # ensure scratch_path exists
@@ -31,7 +31,7 @@ def render_bigstring(bigstring, target, scratch, clear_files=False, repeat=1):
         np_percent = np_percent * 10
         np_matrix = np.reshape(np_percent, (image_segment_split, image_segment_split))
         #print (np_matrix)
-        image = np.zeros((image_segment_split * 128, image_segment_split * 128), dtype=np.uint8)
+        image = np.zeros((image_segment_split * 128, image_segment_split * 128, 3), dtype=np.uint8)
 
         # fill each segment with the corresponding percentage
         for j in range(image_segment_split):
@@ -41,7 +41,11 @@ def render_bigstring(bigstring, target, scratch, clear_files=False, repeat=1):
                 w = 128
                 h = 128
                 fill = int(np_matrix[j, i] / 100 * 255)
-                cv2.rectangle(image, (x, y), (x + w, y + h), fill, -1)
+                
+                if line_num > original_amount and original_amount > 0:
+                    cv2.rectangle(image, (x, y), (x + w, y + h), (fill, 0, 0), -1)
+                else:                
+                    cv2.rectangle(image, (x, y), (x + w, y + h), (fill, fill, fill), -1)  # grayscale
 
         
         # save the image

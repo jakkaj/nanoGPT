@@ -16,12 +16,12 @@ wandb_run_name = 'mini-gpt'
 dataset = 'train_bom_3'
 gradient_accumulation_steps = 1
 batch_size = 64
-block_size = 1024 # context of up to 256 previous characters
+block_size = 2048 # context of up to 256 previous characters
 
 # baby GPT model :)
 n_layer = 6
-n_head = 6
-n_embd = 384
+n_head = 12
+n_embd = 768
 dropout = 0.2
 
 learning_rate = 1e-3 # with baby networks can afford to go a bit higher
