@@ -10,8 +10,8 @@ import numpy as np
 from concurrent.futures import ThreadPoolExecutor
 from tqdm import tqdm
 # Hyperparameters
-image_segment_split = 6
-image_round_percent = 1
+image_segment_split = 8
+image_round_percent = 5
 
 
 scratch_pad = "./data/scratch"
