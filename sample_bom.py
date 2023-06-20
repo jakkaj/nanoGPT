@@ -47,7 +47,7 @@ max_new_tokens = 2048  # number of tokens generated in each sample
 #1 AND 400 IS PRETTY GOOD (JORDO)
 
 temperature = .8
-top_k = 400  # retain only the top_k most likely tokens, clamp others to have 0 probability
+top_k = 300  # retain only the top_k most likely tokens, clamp others to have 0 probability
 seed = random.randint(0, 10000)
 #seed = 1337
 device = 'cuda'  # examples: 'cpu', 'cuda', 'cuda:0', 'cuda:1', etc.

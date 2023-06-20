@@ -17,9 +17,13 @@ def run_process(command):
 #main
 if __name__ == "__main__":   
     
-    prompt_number = 32    
-    render_path = "/data/BomWeather/BomWeather/2020/07/07"
-    starter = "336.png"
+    # prompt_number = 32    
+    # render_path = "/data/BomWeather/BomWeather/2020/07/07"
+    # starter = "336.png"
+    
+    prompt_number = 16    
+    render_path = "/data/BomWeather/BomWeather/2020/01/23"
+    starter = "1000.png"
     
     
     # this one is good (big storm from west)
