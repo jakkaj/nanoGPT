@@ -8,9 +8,12 @@ from bom_tools.preparation_tools import image_segment_split
 def render_gif(files, target, duration=100):
     # create the animation
     with imageio.get_writer(target, mode='I', duration=duration, loop=0) as writer:
-        for file in files:
-            image = imageio.imread(file)
-            writer.append_data(image)
+        try:
+            for file in files:
+                image = imageio.imread(file)
+                writer.append_data(image)
+        except Exception as e:
+            print(f"An error occurred: {e}")
 
 def render_bigstring(bigstring, target, scratch, clear_files=False, repeat=1, original_amount=0):
     
@@ -70,7 +73,7 @@ saves the output to a new gif
 
 def join_gifs(gif_paths, output_path, duration=0.3):
     # read all GIF files into a list of images sequences (frames)
-    gif_images = [imageio.mimread(path) for path in gif_paths]
+    gif_images = [imageio.mimread(path, memtest=False) for path in gif_paths]
 
     # Ensure all gifs have the same number of frames, otherwise this won't work
     min_len = min([len(gif) for gif in gif_images])

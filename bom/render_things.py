@@ -40,7 +40,7 @@ starters = [
 # main
 if __name__ == "__main__":
 
-    p_config = starters[0]
+    p_config = starters[1]
 
     prompt_number = p_config['prompt_number']
     render_path = p_config['render_path']
@@ -114,4 +114,4 @@ if __name__ == "__main__":
     render_bigstring(bigstring, gif2, scratch)
     render_bigstring(prompt_lines, gif4, scratch)
 
-    # join_gifs([gif1, gif2], gif3)
+    join_gifs([gif1, gif2], gif3)

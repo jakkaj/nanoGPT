@@ -11,3 +11,5 @@ data/*
 
 out-shakespeare-char/ckpt.pt
 input.txt
+bom/encoders/data/*
+bom/encoders/MNIST/*

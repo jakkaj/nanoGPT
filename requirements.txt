@@ -9,3 +9,4 @@ tqdm
 opencv-python
 imageio
 scikit-image
+matplotlib

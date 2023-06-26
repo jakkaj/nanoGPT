@@ -39,6 +39,9 @@ def calculate_non_transparent_percentage(image):
         # Calculate percentage
         non_transparent_percentage = (non_transparent_pixels / total_pixels) * 100
         
+        if non_transparent_percentage < 5:
+            non_transparent_percentage = 0
+        
         #round non_transparent_percentage to nearest 5%
         
         
