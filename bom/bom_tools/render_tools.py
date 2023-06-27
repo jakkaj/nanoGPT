@@ -30,8 +30,8 @@ def render_bigstring(bigstring, target, scratch, clear_files=False, repeat=1, or
         line = line.strip()
         percents = [int(p) for p in line.split(' ')]
         np_percent = np.array(percents)
-        # multiple them all by 10
-        np_percent = np_percent * 10
+        
+        np_percent = np_percent
         np_matrix = np.reshape(np_percent, (image_segment_split, image_segment_split))
         #print (np_matrix)
         image = np.zeros((image_segment_split * 128, image_segment_split * 128, 3), dtype=np.uint8)

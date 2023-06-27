@@ -45,5 +45,13 @@
             "console": "integratedTerminal",
             "justMyCode": false,            
         },
+        {
+            "name": "TrainReconstructor",
+            "type": "python",
+            "request": "launch",
+            "program": "bom/prep_reconstruct.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,            
+        },
     ]
 }

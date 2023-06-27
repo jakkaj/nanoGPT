@@ -39,7 +39,7 @@ def calculate_non_transparent_percentage(image):
         # Calculate percentage
         non_transparent_percentage = (non_transparent_pixels / total_pixels) * 100
         
-        if non_transparent_percentage < 5:
+        if non_transparent_percentage < 2:
             non_transparent_percentage = 0
         
         #round non_transparent_percentage to nearest 5%
@@ -53,19 +53,29 @@ def calculate_non_transparent_percentage(image):
     
 
     #round up non_transparent_percentage to nearest int
-    non_transparent_percentage =  math.ceil(non_transparent_percentage)
+    non_transparent_percentage =  math.floor(non_transparent_percentage)
     #non_transparent_percentage = non_transparent_percentage / 100
-    non_transparent_percentage = math.ceil(non_transparent_percentage / image_round_percent) * image_round_percent
+    non_transparent_percentage = math.floor(non_transparent_percentage / image_round_percent) * image_round_percent
 
     # if(non_transparent_percentage > 20):
     #     print(f"non_transparent_percentage: {non_transparent_percentage}")
 
     return non_transparent_percentage
 
+def percentages_to_image(percents, seg = image_segment_split):
+    percentages = np.array(percents)
+    # Reshape to 3x3 and convert to grayscale image
+    img_small = np.reshape(percentages, (seg, seg))
+
+    # Convert small image to 8-bit grayscale image (range 0-255)
+    img_small = (img_small * 255).astype(np.uint8)
+    
+    return img_small
+
 # opens the file with opencv
-def image_parser(file):
+def image_parser(file, seg = image_segment_split):
     #print(file)
-    global image_segments
+    
     # open the file with opencv
     img = cv2.imread(file, cv2.IMREAD_UNCHANGED)
     if(img is None):
@@ -73,11 +83,9 @@ def image_parser(file):
         return None
     filename_nopath = os.path.basename(file)
     
+    img[:16,:] = 0
     
-    #trim the top 20 px from the img to take out bom logo
-    img = img[16:,:]
-    
-    threshold = np.all(img[..., :3] < [15, 15, 15], axis=2)
+    threshold = np.all(img[..., :3] < [5, 5, 5], axis=2)
 
     # For every pixel that is close to black, we set its alpha value to 0
     img[threshold] = (0, 0, 0, 0)
@@ -85,12 +93,16 @@ def image_parser(file):
     # get the height and width of the image
     height, width, channels = img.shape
 
-    horizontal_segments = image_segment_split
-    vertical_segments = image_segment_split
+    horizontal_segments = seg
+    vertical_segments = seg
 
     # calculate the size of each segment
     segment_width = width // horizontal_segments
     segment_height = height // vertical_segments
+
+    # if segment_width or segment_height is not a whole number, throw error
+    if segment_width * horizontal_segments != width or segment_height * vertical_segments != height:
+        raise ValueError('The number of horizontal/vertical segments must divide the image perfectly.')
 
     # initialize an array to hold the image segments
     image_segments = []
@@ -122,26 +134,29 @@ def image_parser(file):
         percent = calculate_non_transparent_percentage(segment)
         percents.append(percent)
     
-    #print(percents)
-    percentages = np.array(percents)
-    percentages = np.ceil(10 * percentages) / 100.0
+    # #print(percents)
+    # percentages = np.array(percents)
+    # percentages = np.ceil(10 * percentages) / 100.0
 
-    # Clip values to the valid range for safety
-    percentages = np.clip(percentages, 0, 1)
+    # # Clip values to the valid range for safety
+    # percentages = np.clip(percentages, 0, 1)
 
-    # Reshape to 3x3 and convert to grayscale image
-    img_small = np.reshape(percentages, (image_segment_split, image_segment_split))
+    # # Reshape to 3x3 and convert to grayscale image
+    # img_small = np.reshape(percentages, (seg, seg))
 
-    # Convert small image to 8-bit grayscale image (range 0-255)
-    img_small = (img_small * 255).astype(np.uint8)
+    # # Convert small image to 8-bit grayscale image (range 0-255)
+    # img_small = (img_small * 255).astype(np.uint8)
 
-    # Upscale using nearest neighbor interpolation (to avoid blending values)
-    img_large = cv2.resize(img_small, (image_segment_split * 128, image_segment_split * 128), interpolation = cv2.INTER_NEAREST)
-    out_file = os.path.join(scratch_pad, filename_nopath + "_large.png")
+    # # Upscale using nearest neighbor interpolation (to avoid blending values)
+    # img_large = cv2.resize(img_small, (seg * 128, seg * 128), interpolation = cv2.INTER_NEAREST)
+    # out_file = os.path.join(scratch_pad, filename_nopath + "_large.png")
     # Save the image
     #cv2.imwrite(out_file, img_large)
     
     return percents
+
+def get_scratch():
+    return scratch_pad
 
 def _clear_scratch():
     if os.path.exists(scratch_pad):
