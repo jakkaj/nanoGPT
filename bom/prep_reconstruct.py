@@ -50,7 +50,7 @@ if __name__ == "__main__":
     files = sorted(files)
     
     # get first 1000 files
-    files = files[:200]
+    #files = files[:200]
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=16) as executor:
         img_pairs = list(tqdm(executor.map(process_file, files), total=len(files)))
