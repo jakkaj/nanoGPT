@@ -14,3 +14,4 @@ input.txt
 bom/encoders/data/*
 bom/encoders/MNIST/*
 *MNIST*
+*.pth
