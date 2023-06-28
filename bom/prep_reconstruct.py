@@ -11,9 +11,10 @@ import cv2
 from bom_tools.preparation_tools import get_scratch, percentages_to_image, image_parser, get_percents_string, get_percents, encode_lines, encode, get_vocabs, local_encode, recursive_directory_reader, calculate_non_transparent_percentage, scratch_pad, base_path, image_segment_split, _clear_scratch, image_parser_wrapper
 from bom_tools.render_tools import join_gifs, render_gif, render_bigstring
 
+resize_size = 128
 
 def process_file(file):
-    scratch = get_scratch()
+    
     
     file_percent = image_parser(file)
     if file_percent is  None:
@@ -33,14 +34,14 @@ def process_file(file):
     # # save with cv2
     # cv2.imwrite(file_save, parsed_image)
     
-    high_res_percent = image_parser(file, 32)
-    high_parsed_image = percentages_to_image(high_res_percent, 32)
+    high_res_percent = image_parser(file, resize_size)
+    high_parsed_image = percentages_to_image(high_res_percent, resize_size)
     return (parsed_image, high_parsed_image)
 
 
 # main
 if __name__ == "__main__":
-    scratch = _clear_scratch()
+    scratch = get_scratch()
     render_path = '/data/BomWeather/BomWeather'
 
     
@@ -52,7 +53,7 @@ if __name__ == "__main__":
     # get first 1000 files
     #files = files[:200]
 
-    with concurrent.futures.ThreadPoolExecutor(max_workers=16) as executor:
+    with concurrent.futures.ProcessPoolExecutor(max_workers=16) as executor:
         img_pairs = list(tqdm(executor.map(process_file, files), total=len(files)))
 
         
@@ -66,5 +67,5 @@ if __name__ == "__main__":
     
     
     
-    with open(os.path.join(scratch, 'img_pairs.pkl'), 'wb') as f:
+    with open(os.path.join(scratch, f'img_pairs_{resize_size}.pkl'), 'wb') as f:
         pickle.dump(img_pairs_np, f)
