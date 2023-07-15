@@ -40,7 +40,7 @@ starters = [
 # main
 if __name__ == "__main__":
 
-    p_config = starters[1]
+    p_config = starters[0]
 
     prompt_number = p_config['prompt_number']
     render_path = p_config['render_path']

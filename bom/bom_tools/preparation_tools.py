@@ -39,7 +39,7 @@ def calculate_non_transparent_percentage(image):
         # Calculate percentage
         non_transparent_percentage = (non_transparent_pixels / total_pixels) * 100
         
-        if non_transparent_percentage < 2:
+        if non_transparent_percentage < 10:
             non_transparent_percentage = 0
         
         #round non_transparent_percentage to nearest 5%
@@ -71,6 +71,48 @@ def percentages_to_image(percents, seg = image_segment_split):
     img_small = (img_small * 255).astype(np.uint8)
     
     return img_small
+
+
+
+
+def tidy_image(image):
+    # Find the size of the image
+    height, width = image.shape
+
+    # Determine the size of each segment
+    segment_height = height // image_segment_split
+    segment_width = width // image_segment_split
+
+    # Create a new image to hold the output
+    output_image = np.zeros_like(image)
+
+    # Iterate over the image
+    for i in range(image_segment_split):
+        for j in range(image_segment_split):
+            # Find the bounds of the current segment
+            start_i = i * segment_height
+            end_i = (i+1) * segment_height
+            start_j = j * segment_width
+            end_j = (j+1) * segment_width
+
+            # Extract the segment from the image
+            segment = image[start_i:end_i, start_j:end_j]
+
+            # Count the number of non-black pixels
+            non_black_pixels = np.sum(segment > 0)
+
+            # If less than 5% of the pixels are non-black
+            if non_black_pixels < 0.10 * segment_width * segment_height:
+                # Set the segment to black
+                output_image[start_i:end_i, start_j:end_j] = 0
+            else:
+                # Otherwise, copy the original segment
+                output_image[start_i:end_i, start_j:end_j] = segment
+
+    return output_image
+
+
+    
 
 # opens the file with opencv
 def image_parser(file, seg = image_segment_split):

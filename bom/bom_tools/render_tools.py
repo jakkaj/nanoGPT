@@ -18,14 +18,17 @@ def render_gif(files, target, duration=100):
 
 model = None
 
+rescale_size = 128
+
 def upscale_image(image):
-    model = get_model()
+    model = get_model(rescale_size)
     img = np.array(image)
     img = transform_input(img)
     to_score = img.reshape(-1, 8*8)
+    to_score = img.reshape(-1, 1, 8, 8)
     to_score = to_score.to('cuda')
     scored = model.decode(to_score)
-    reshaped_img = scored[0].cpu().detach().numpy().reshape(32, 32, 1)
+    reshaped_img = scored[0].cpu().detach().numpy().reshape(rescale_size, rescale_size, 1)
     reshaped_img = (255.0 / reshaped_img.max() * (reshaped_img - reshaped_img.min())).astype(np.uint8)
 
     # print(reshaped_img.shape)
