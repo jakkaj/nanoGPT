@@ -82,6 +82,14 @@ def handle_missing_trading_days(df):
         expected_date_range = pd.date_range(start=start_date, end=end_date, freq=us_business_days)
         expected_date_range.name = original_index_name # Assign name to the new range
 
+        # --- FIX: Remove duplicate index entries before reindexing ---
+        # Keep the first occurrence of duplicate dates
+        if stock_df.index.duplicated().any():
+            num_duplicates = stock_df.index.duplicated().sum()
+            logging.warning(f"Stock ID {stock_id}: Found and removed {num_duplicates} duplicate date entries. Keeping first occurrence.")
+            stock_df = stock_df[~stock_df.index.duplicated(keep='first')]
+        # --- END FIX ---
+
         # Reindex the DataFrame to include all expected business days, marking missing ones as NaN
         # The new index will have the name assigned above.
         stock_df_reindexed = stock_df.reindex(expected_date_range)
