@@ -11,3 +11,7 @@ imageio
 scikit-image
 matplotlib
 imageio[pyav]
+twelvedata
+dotenv
+pandas 
+mplfinance

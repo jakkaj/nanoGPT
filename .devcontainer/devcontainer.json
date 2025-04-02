@@ -58,7 +58,8 @@
 				"esbenp.prettier-vscode",
 				"ms-azuretools.azure-dev",
 				"kevinrose.vsc-python-indent",
-				"visualstudioexptteam.vscodeintellicode"
+				"visualstudioexptteam.vscodeintellicode",
+				"RooVeterinaryInc.roo-cline"
 			]
 		}
 	},
