@@ -59,7 +59,8 @@
 				"ms-azuretools.azure-dev",
 				"kevinrose.vsc-python-indent",
 				"visualstudioexptteam.vscodeintellicode",
-				"RooVeterinaryInc.roo-cline"
+				"RooVeterinaryInc.roo-cline",
+				"bierner.markdown-mermaid"
 			]
 		}
 	},

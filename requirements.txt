@@ -13,5 +13,7 @@ matplotlib
 imageio[pyav]
 twelvedata
 dotenv
-pandas 
+pandas
 mplfinance
+pyarrow
+pytest
